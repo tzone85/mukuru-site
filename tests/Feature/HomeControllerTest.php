@@ -86,4 +86,59 @@ class HomeControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('home');
     }
+
+    /**
+     * Test that HomeController class exists
+     *
+     * @return void
+     */
+    public function testHomeControllerExists()
+    {
+        $this->assertTrue(class_exists('App\Http\Controllers\HomeController'));
+    }
+
+    /**
+     * Test HomeController basic structure
+     *
+     * @return void
+     */
+    public function testHomeControllerBasicStructure()
+    {
+        $reflection = new \ReflectionClass('App\Http\Controllers\HomeController');
+
+        // Test that the class exists and is instantiable
+        $this->assertTrue($reflection->isInstantiable());
+
+        // Test that it has the expected methods
+        $this->assertTrue($reflection->hasMethod('index'));
+        $this->assertTrue($reflection->hasMethod('__construct'));
+    }
+
+    /**
+     * Test HomeController index method signature
+     *
+     * @return void
+     */
+    public function testHomeControllerIndexMethod()
+    {
+        $reflection = new \ReflectionClass('App\Http\Controllers\HomeController');
+        $indexMethod = $reflection->getMethod('index');
+
+        // Test that the index method exists and is public
+        $this->assertTrue($indexMethod->isPublic());
+        $this->assertEquals('index', $indexMethod->getName());
+    }
+
+    /**
+     * Test that HomeController extends base Controller
+     *
+     * @return void
+     */
+    public function testHomeControllerExtendsController()
+    {
+        $reflection = new \ReflectionClass('App\Http\Controllers\HomeController');
+
+        // Test that it extends the base Controller class
+        $this->assertEquals('App\Http\Controllers\Controller', $reflection->getParentClass()->getName());
+    }
 }
