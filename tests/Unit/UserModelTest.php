@@ -12,6 +12,33 @@ class UserModelTest extends TestCase
     use RefreshDatabase;
 
     /**
+     * Test that User class exists
+     *
+     * @return void
+     */
+    public function testUserClassExists()
+    {
+        $this->assertTrue(class_exists('App\User'));
+    }
+
+    /**
+     * Test basic User class properties
+     *
+     * @return void
+     */
+    public function testUserClassBasicProperties()
+    {
+        $reflection = new \ReflectionClass('App\User');
+
+        // Test that the class exists
+        $this->assertTrue($reflection->isInstantiable());
+
+        // Test that it has the expected properties
+        $this->assertTrue($reflection->hasProperty('fillable'));
+        $this->assertTrue($reflection->hasProperty('hidden'));
+    }
+
+    /**
      * Test that the User model has the correct fillable attributes.
      *
      * @return void
@@ -27,6 +54,20 @@ class UserModelTest extends TestCase
         ];
 
         $this->assertEquals($expectedFillable, $user->getFillable());
+    }
+
+    /**
+     * Test User model has expected fillable attributes
+     *
+     * @return void
+     */
+    public function testUserModelHasFillableAttributes()
+    {
+        // Create a User instance without Laravel bootstrap
+        $user = new \App\User();
+
+        $expected = ['name', 'email', 'password'];
+        $this->assertEquals($expected, $user->getFillable());
     }
 
     /**
@@ -47,6 +88,20 @@ class UserModelTest extends TestCase
     }
 
     /**
+     * Test User model has expected hidden attributes
+     *
+     * @return void
+     */
+    public function testUserModelHasHiddenAttributes()
+    {
+        // Create a User instance without Laravel bootstrap
+        $user = new \App\User();
+
+        $expected = ['password', 'remember_token'];
+        $this->assertEquals($expected, $user->getHidden());
+    }
+
+    /**
      * Test that the User model uses the Notifiable trait.
      *
      * @return void
@@ -56,6 +111,19 @@ class UserModelTest extends TestCase
         $user = new User();
 
         $this->assertContains(Notifiable::class, class_uses($user));
+    }
+
+    /**
+     * Test User model uses Notifiable trait
+     *
+     * @return void
+     */
+    public function testUserModelUsesNotifiableTrait()
+    {
+        $user = new \App\User();
+
+        $this->assertTrue(method_exists($user, 'notify'));
+        $this->assertTrue(method_exists($user, 'notifyNow'));
     }
 
     /**

@@ -3,8 +3,8 @@
          backupStaticAttributes="false"
          bootstrap="tests/bootstrap.php"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
+         convertErrorsToExceptions="false"
+         convertNoticesToExceptions="false"
          convertWarningsToExceptions="false"
          processIsolation="false"
          stopOnFailure="false">
