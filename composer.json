@@ -5,15 +5,16 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": ">=7.4.0",
+        "php": "^7.2|^8.0",
         "fideloper/proxy": "^4.4",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^2.0"
     },
     "require-dev": {
-        "filp/whoops": "^2.0",
-        "fzaninotto/faker": "^1.9",
+        "facade/ignition": "^1.4",
+        "fakerphp/faker": "^1.9.1",
         "mockery/mockery": "^1.1",
+        "nunomaduro/collision": "^3.0",
         "phpunit/phpunit": "^8.5",
         "symfony/thanks": "^1.0"
     },
@@ -52,6 +53,10 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "audit": {
+            "abandoned": "report",
+            "block-insecure": false
+        }
     }
 }
