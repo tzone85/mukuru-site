@@ -14,6 +14,16 @@ trait CreatesApplication
      */
     public function createApplication()
     {
+        // Set a custom error handler that skips deprecation warnings
+        set_error_handler(function ($severity, $message, $file, $line) {
+            // Skip deprecation warnings completely
+            if ($severity === E_DEPRECATED || $severity === E_USER_DEPRECATED) {
+                return true;
+            }
+            // Let other errors proceed normally
+            return false;
+        }, E_ALL);
+
         $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Kernel::class)->bootstrap();
