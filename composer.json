@@ -57,6 +57,9 @@
         "audit": {
             "abandoned": "report",
             "block-insecure": false
+        },
+        "allow-plugins": {
+            "symfony/thanks": true
         }
     }
 }
