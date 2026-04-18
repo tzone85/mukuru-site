@@ -21,4 +21,4 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/currency-rates', function () {
     return view('currency-rates');
-})->name('currency-rates');
+})->name('currency.rates');
