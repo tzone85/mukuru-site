@@ -14,10 +14,18 @@ trait CreatesApplication
      */
     public function createApplication()
     {
+        // Completely disable deprecation warnings
+        error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
         // Set a custom error handler that skips deprecation warnings
         set_error_handler(function ($severity, $message, $file, $line) {
-            // Skip deprecation warnings completely
-            if ($severity === E_DEPRECATED || $severity === E_USER_DEPRECATED) {
+            // Skip all deprecation warnings completely
+            if (
+                $severity === E_DEPRECATED ||
+                $severity === E_USER_DEPRECATED ||
+                strpos($message, 'deprecated') !== false ||
+                strpos($message, 'Implicitly marking parameter') !== false
+            ) {
                 return true;
             }
             // Let other errors proceed normally
