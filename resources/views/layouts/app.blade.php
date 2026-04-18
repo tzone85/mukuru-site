@@ -12,6 +12,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    @livewireStyles
 </head>
 <body>
     <div id="app">
@@ -24,6 +25,12 @@
                         {{ config('app.name', 'Mukuru') }}
                     </a>
                 </div>
+
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="{{ route('currency.rates') }}">Currency Rates</a></li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
@@ -32,5 +39,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    @livewireScripts
 </body>
 </html>

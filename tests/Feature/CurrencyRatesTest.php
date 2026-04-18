@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Http\Livewire\CurrencyRates;
 
@@ -219,5 +221,43 @@ class CurrencyRatesTest extends TestCase
 
         $component->setBaseCurrency('GBP');
         $this->assertEquals('GBP', $component->baseCurrency);
+    }
+
+    /**
+     * Test that currency rates route is accessible.
+     *
+     * @return void
+     */
+    public function testCurrencyRatesRouteIsAccessible()
+    {
+        $response = $this->get('/currency-rates');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('currency-rates');
+    }
+
+    /**
+     * Test that currency rates route has correct name.
+     *
+     * @return void
+     */
+    public function testCurrencyRatesRouteHasCorrectName()
+    {
+        $response = $this->get(route('currency.rates'));
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test that currency rates page contains expected content.
+     *
+     * @return void
+     */
+    public function testCurrencyRatesPageContainsExpectedContent()
+    {
+        $response = $this->get('/currency-rates');
+
+        $response->assertSee('Currency Exchange Rates');
+        $response->assertSee('Real-time currency rates will be displayed here');
     }
 }
