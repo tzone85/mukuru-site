@@ -6,7 +6,7 @@
 @import "variables";
 
 // Tailwind CSS
-@import "../css/app.css";
+// @import "../css/app.css"; // Removed circular dependency
 
 // Bootstrap
 @import "~bootstrap-sass/assets/stylesheets/bootstrap";
