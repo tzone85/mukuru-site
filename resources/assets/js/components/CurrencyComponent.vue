@@ -87,6 +87,12 @@ const onSelect = () => {
     console.log(order.currency);
 };
 
+const getQuote = () => {
+    // This function is called on form submit
+    // Implementation would depend on business requirements
+    console.log('Getting quote for order:', order);
+};
+
 const createOrder = () => {
     window.axios.post(API_URL + "/orders", order)
         .then(response => {
