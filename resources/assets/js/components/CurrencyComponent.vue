@@ -60,13 +60,13 @@
         },
         methods: {
             fetchCurrencies() {
-                axios.get(API_URL + "/currencies").then(response => {
+                window.axios.get(API_URL + "/currencies").then(response => {
                     this.currencies = response.data
                 });
             },
             getTotalAmount() {
                 this.order.total_amount = '';
-                axios.post(API_URL + "/get-total-amount", this.order)
+                window.axios.post(API_URL + "/get-total-amount", this.order)
                     .then(response => {
                         this.order.total_amount = response.data.total_amount;
                     })
@@ -76,7 +76,7 @@
             },
             getForeignCurrencyAmount() {
                 this.order.foreign_currency_amount = '';
-                axios.post(API_URL + "/get-foreign-currency-amount", this.order)
+                window.axios.post(API_URL + "/get-foreign-currency-amount", this.order)
                     .then(response => {
                         this.order.foreign_currency_amount = response.data.foreign_currency_amount;
                     })
@@ -88,7 +88,7 @@
                 console.log(this.order.currency)
             },
             createOrder() {
-                axios.post(API_URL + "/orders", this.order)
+                window.axios.post(API_URL + "/orders", this.order)
                     .then(response => {
                         console.log(response);
                         alert('Order created');
