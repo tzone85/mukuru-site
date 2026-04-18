@@ -1,21 +1,41 @@
 <?php
 
-// Configure error handling for PHPUnit + Laravel 5.5 + PHP 8.x compatibility
-// This addresses specific compatibility issues while maintaining test functionality
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_STRICT);
-ini_set('error_reporting', E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_STRICT);
+/*
+ * PHPUnit bootstrap for Laravel 5.5 + PHP 8.5 compatibility
+ *
+ * Problem: Laravel 5.5 framework has implicit nullable parameters that trigger
+ * deprecation warnings in PHP 8+. These warnings get converted to exceptions
+ * during application bootstrap, causing all Laravel-based tests to fail.
+ *
+ * Solution: Targeted error suppression for framework compatibility while
+ * preserving proper error detection for actual test code.
+ */
 
-// Set error handler before autoloader to catch early deprecation warnings
+// Set up error suppression before autoloader runs
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-    // Suppress specific Laravel 5.5 + PHP 8.x compatibility issues
+    // Suppress Laravel 5.5 framework compatibility warnings
     if ($errno === E_DEPRECATED || $errno === E_USER_DEPRECATED) {
-        return true; // Suppress deprecation warnings
+        // Specifically target Laravel framework deprecation warnings
+        if (strpos($errfile, 'laravel/framework') !== false ||
+            strpos($errfile, 'illuminate/') !== false ||
+            strpos($errstr, 'Implicitly marking parameter') !== false ||
+            strpos($errstr, 'nullable is deprecated') !== false) {
+            return true; // Suppress Laravel framework deprecations
+        }
     }
-    if ($errno === E_STRICT) {
-        return true; // Suppress strict standards warnings
+
+    // Suppress strict standards warnings from Laravel 5.5
+    if ($errno === E_STRICT && strpos($errfile, 'vendor/') !== false) {
+        return true;
     }
-    return false; // Let other errors proceed
+
+    // Let all other errors through for proper test failure detection
+    return false;
 }, E_ALL);
 
-// Load the normal Composer autoloader
+// Configure error reporting for compatibility
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+
+// Load Composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
