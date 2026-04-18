@@ -42,61 +42,64 @@
     </form>
 </template>
 
-<script>
-    export default {
-        mounted() {
-            this.fetchCurrencies();
-        },
-        data() {
-            return {
-                currencies: [],
-                surchargeAmount: '',
-                order: {
-                    foreign_currency_amount: '',
-                    total_amount: '',
-                    currency: ''
-                }
-            }
-        },
-        methods: {
-            fetchCurrencies() {
-                window.axios.get(API_URL + "/currencies").then(response => {
-                    this.currencies = response.data
-                });
-            },
-            getTotalAmount() {
-                this.order.total_amount = '';
-                window.axios.post(API_URL + "/get-total-amount", this.order)
-                    .then(response => {
-                        this.order.total_amount = response.data.total_amount;
-                    })
-                    .catch(error => {
-                        alert(error.response?.data?.message || 'An error occurred')
-                    });
-            },
-            getForeignCurrencyAmount() {
-                this.order.foreign_currency_amount = '';
-                window.axios.post(API_URL + "/get-foreign-currency-amount", this.order)
-                    .then(response => {
-                        this.order.foreign_currency_amount = response.data.foreign_currency_amount;
-                    })
-                    .catch(error => {
-                        alert(error.response?.data?.message || 'An error occurred')
-                    });
-            },
-            onSelect() {
-                console.log(this.order.currency)
-            },
-            createOrder() {
-                window.axios.post(API_URL + "/orders", this.order)
-                    .then(response => {
-                        console.log(response);
-                        alert('Order created');
-                    })
-                    .catch(error => {
-                        alert(error.response?.data?.message || 'An error occurred')
-                    });
-            }
-        },
-    }
+<script setup>
+import { ref, reactive, onMounted } from 'vue';
+
+// Reactive data
+const currencies = ref([]);
+const surchargeAmount = ref('');
+const order = reactive({
+    foreign_currency_amount: '',
+    total_amount: '',
+    currency: ''
+});
+
+// Methods
+const fetchCurrencies = () => {
+    window.axios.get(API_URL + "/currencies").then(response => {
+        currencies.value = response.data;
+    });
+};
+
+const getTotalAmount = () => {
+    order.total_amount = '';
+    window.axios.post(API_URL + "/get-total-amount", order)
+        .then(response => {
+            order.total_amount = response.data.total_amount;
+        })
+        .catch(error => {
+            alert(error.response?.data?.message || 'An error occurred');
+        });
+};
+
+const getForeignCurrencyAmount = () => {
+    order.foreign_currency_amount = '';
+    window.axios.post(API_URL + "/get-foreign-currency-amount", order)
+        .then(response => {
+            order.foreign_currency_amount = response.data.foreign_currency_amount;
+        })
+        .catch(error => {
+            alert(error.response?.data?.message || 'An error occurred');
+        });
+};
+
+const onSelect = () => {
+    console.log(order.currency);
+};
+
+const createOrder = () => {
+    window.axios.post(API_URL + "/orders", order)
+        .then(response => {
+            console.log(response);
+            alert('Order created');
+        })
+        .catch(error => {
+            alert(error.response?.data?.message || 'An error occurred');
+        });
+};
+
+// Lifecycle
+onMounted(() => {
+    fetchCurrencies();
+});
 </script>
