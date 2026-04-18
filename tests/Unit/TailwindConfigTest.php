@@ -8,7 +8,7 @@ class TailwindConfigTest extends TestCase
 {
     private $projectRoot;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->projectRoot = dirname(dirname(__DIR__));
@@ -27,10 +27,10 @@ class TailwindConfigTest extends TestCase
         $content = file_get_contents($configPath);
 
         // Check for proper content paths
-        $this->assertContains('./resources/**/*.blade.php', $content, 'Should include Blade template paths');
-        $this->assertContains('./resources/**/*.vue', $content, 'Should include Vue component paths');
-        $this->assertContains('./resources/**/*.js', $content, 'Should include JavaScript paths');
-        $this->assertContains('./app/**/*.php', $content, 'Should include app PHP files');
+        $this->assertStringContainsString('./resources/**/*.blade.php', $content, 'Should include Blade template paths');
+        $this->assertStringContainsString('./resources/**/*.vue', $content, 'Should include Vue component paths');
+        $this->assertStringContainsString('./resources/**/*.js', $content, 'Should include JavaScript paths');
+        $this->assertStringContainsString('./app/**/*.php', $content, 'Should include app PHP files');
     }
 
     /**
@@ -46,9 +46,9 @@ class TailwindConfigTest extends TestCase
         $content = file_get_contents($cssPath);
 
         // Check for Tailwind directives
-        $this->assertContains('@tailwind base;', $content, 'Should contain @tailwind base directive');
-        $this->assertContains('@tailwind components;', $content, 'Should contain @tailwind components directive');
-        $this->assertContains('@tailwind utilities;', $content, 'Should contain @tailwind utilities directive');
+        $this->assertStringContainsString('@tailwind base;', $content, 'Should contain @tailwind base directive');
+        $this->assertStringContainsString('@tailwind components;', $content, 'Should contain @tailwind components directive');
+        $this->assertStringContainsString('@tailwind utilities;', $content, 'Should contain @tailwind utilities directive');
     }
 
     /**
@@ -64,11 +64,11 @@ class TailwindConfigTest extends TestCase
         $content = file_get_contents($scssPath);
 
         // Check that it imports the new CSS structure
-        $this->assertContains('@import "../css/app.css";', $content, 'Should import the new Tailwind CSS structure');
+        $this->assertStringContainsString('@import "../css/app.css";', $content, 'Should import the new Tailwind CSS structure');
 
         // Ensure original imports are still present
-        $this->assertContains('@import "variables";', $content, 'Should still import variables');
-        $this->assertContains('~bootstrap-sass/assets/stylesheets/bootstrap', $content, 'Should still import Bootstrap');
+        $this->assertStringContainsString('@import "variables";', $content, 'Should still import variables');
+        $this->assertStringContainsString('~bootstrap-sass/assets/stylesheets/bootstrap', $content, 'Should still import Bootstrap');
     }
 
     /**
