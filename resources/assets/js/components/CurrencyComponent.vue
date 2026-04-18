@@ -60,41 +60,41 @@
         },
         methods: {
             fetchCurrencies() {
-                this.$http.get(API_URL + "/currencies").then(response => {
+                axios.get(API_URL + "/currencies").then(response => {
                     this.currencies = response.data
                 });
             },
             getTotalAmount() {
                 this.order.total_amount = '';
-                this.$http.post(API_URL + "/get-total-amount", this.order)
+                axios.post(API_URL + "/get-total-amount", this.order)
                     .then(response => {
                         this.order.total_amount = response.data.total_amount;
                     })
                     .catch(error => {
-                        alert(error.body.message)
+                        alert(error.response?.data?.message || 'An error occurred')
                     });
             },
             getForeignCurrencyAmount() {
                 this.order.foreign_currency_amount = '';
-                this.$http.post(API_URL + "/get-foreign-currency-amount", this.order)
+                axios.post(API_URL + "/get-foreign-currency-amount", this.order)
                     .then(response => {
                         this.order.foreign_currency_amount = response.data.foreign_currency_amount;
                     })
                     .catch(error => {
-                        alert(error.body.message)
+                        alert(error.response?.data?.message || 'An error occurred')
                     });
             },
             onSelect() {
                 console.log(this.order.currency)
             },
             createOrder() {
-                this.$http.post(API_URL + "/orders", this.order)
+                axios.post(API_URL + "/orders", this.order)
                     .then(response => {
                         console.log(response);
                         alert('Order created');
                     })
                     .catch(error => {
-                        alert(error.body.message)
+                        alert(error.response?.data?.message || 'An error occurred')
                     });
             }
         },
