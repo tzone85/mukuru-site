@@ -1,14 +1,13 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
+require("./bootstrap");
 
-window.Vue = require('vue');
-window.Vue.use(require('vue-resource'));
+import { createApp } from "vue";
+import CurrencyComponent from "./components/CurrencyComponent.vue";
 
 console.log(process.env);
 
@@ -18,8 +17,8 @@ console.log(process.env);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('currency-component', require('./components/CurrencyComponent.vue'));
+const app = createApp({});
 
-const app = new Vue({
-    el: '#app'
-});
+app.component("currency-component", CurrencyComponent);
+
+app.mount("#app");
