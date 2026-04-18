@@ -1088,8 +1088,7 @@ module.exports = __webpack_require__(47);
 
 __webpack_require__(12);
 
-window.Vue = __webpack_require__(36);
-window.Vue.use(__webpack_require__(39));
+const { createApp } = __webpack_require__(36);
 
 console.log(Object({"NODE_ENV":"development"}));
 
@@ -1099,11 +1098,11 @@ console.log(Object({"NODE_ENV":"development"}));
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('currency-component', __webpack_require__(44));
+const app = createApp({});
 
-var app = new Vue({
-  el: '#app'
-});
+app.component('currency-component', __webpack_require__(44));
+
+app.mount('#app');
 
 /***/ }),
 /* 12 */
