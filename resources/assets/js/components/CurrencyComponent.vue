@@ -89,7 +89,6 @@ const onSelect = () => {
 
 const getQuote = () => {
     // This function is called on form submit
-    // Implementation would depend on business requirements
     console.log('Getting quote for order:', order);
 };
 
