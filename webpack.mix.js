@@ -1,5 +1,5 @@
-let mix = require('laravel-mix');
-require('cross-env')
+let mix = require("laravel-mix");
+require("cross-env");
 
 /*
  |--------------------------------------------------------------------------
@@ -12,5 +12,10 @@ require('cross-env')
  |
  */
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css');
+mix
+  .js("resources/assets/js/app.js", "public/js")
+  .vue({ version: 3 })
+  .sass("resources/assets/sass/app.scss", "public/css")
+  .options({
+    processCssUrls: false,
+  });

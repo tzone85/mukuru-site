@@ -7,9 +7,11 @@
 require("./bootstrap");
 
 import { createApp } from "vue";
+import axios from "axios";
 import CurrencyComponent from "./components/CurrencyComponent.vue";
 
-window.axios = require("axios");
+// Make axios available globally for components that need it
+window.axios = axios;
 
 console.log(process.env);
 
