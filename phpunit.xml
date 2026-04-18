@@ -3,9 +3,9 @@
          backupStaticAttributes="false"
          bootstrap="tests/bootstrap.php"
          colors="true"
-         convertErrorsToExceptions="false"
-         convertNoticesToExceptions="false"
-         convertWarningsToExceptions="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
          convertDeprecationsToExceptions="false"
          processIsolation="false"
          stopOnFailure="false">
@@ -31,6 +31,6 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="APP_KEY" value="base64:LKaJi9n3RkKaG3Eg5p2zVHSUcFjt9wX6GqEqd8aQFLI="/>
-        <ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED &amp; ~E_USER_DEPRECATED"/>
+        <ini name="error_reporting" value="22519" />
     </php>
 </phpunit>
