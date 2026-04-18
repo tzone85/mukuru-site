@@ -14,8 +14,9 @@ trait CreatesApplication
      */
     public function createApplication()
     {
-        // Completely disable deprecation warnings
+        // Suppress deprecation warnings globally before Laravel bootstrap
         error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+        ini_set('error_reporting', E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 
         // Set a custom error handler that skips deprecation warnings
         set_error_handler(function ($severity, $message, $file, $line) {
