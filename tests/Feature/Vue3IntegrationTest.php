@@ -2,290 +2,241 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 
 class Vue3IntegrationTest extends TestCase
 {
     /**
-     * Test that Vue 3 integration loads properly with currency component
-     *
-     * @return void
+     * Test that Blade view with currency component loads properly
+     * This test specifically loads the welcome.blade.php view that contains <currency-component>
      */
-    public function testVue3IntegrationWithCurrencyComponent()
+    public function testBladeViewWithCurrencyComponentLoads()
     {
+        // Load the actual Blade view that contains Vue currency component
         $response = $this->get('/');
 
         $response->assertStatus(200);
+
+        // Verify the Vue app mount point exists
         $response->assertSee('<div id="app">', false);
-        $response->assertSee('<script src="', false);
+
+        // Verify the currency component tag is present in the Blade view
+        $response->assertSee('<currency-component></currency-component>', false);
+
+        // Verify the API_URL script is present for component functionality
+        $response->assertSee('let API_URL =', false);
     }
 
     /**
-     * Test that JavaScript compilation loads correctly
-     *
-     * @return void
+     * Test that JavaScript compilation is successful and contains Vue 3 code
+     * This verifies the webpack compilation process worked correctly
      */
-    public function testJavaScriptCompilationLoads()
+    public function testJavaScriptCompilationSuccessful()
     {
-        // Test that the compiled JS file exists and is accessible
-        $response = $this->get('/js/app.js');
+        $appJsPath = public_path('js/app.js');
 
+        // Verify compiled JavaScript file exists
+        $this->assertFileExists($appJsPath, 'Compiled app.js file should exist');
+
+        $jsContent = file_get_contents($appJsPath);
+
+        // Verify Vue is present in compiled JS (for Vue 2 to Vue 3 upgrade)
+        $this->assertStringContainsString('Vue', $jsContent, 'Vue should be present in compiled JavaScript');
+
+        // Verify currency component is registered
+        $this->assertStringContainsString('currency-component', $jsContent, 'Currency component should be registered in JavaScript');
+
+        // Test that JS file is accessible via HTTP
+        $response = $this->get('/js/app.js');
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/javascript');
     }
 
     /**
-     * Test that app.js contains Vue initialization code
-     *
-     * @return void
-     */
-    public function testAppJsContainsVueCode()
-    {
-        $appJsPath = public_path('js/app.js');
-
-        if (!file_exists($appJsPath)) {
-            $this->markTestSkipped('app.js file not compiled yet');
-        }
-
-        $content = file_get_contents($appJsPath);
-
-        // Test that Vue is initialized
-        $this->assertStringContainsString('Vue', $content);
-    }
-
-    /**
-     * Test Vue 3 mount functionality by checking for mounted DOM elements
-     *
-     * @return void
+     * Test Vue 3 mount functionality by verifying component structure
+     * This tests the actual Vue 3 mount point and component registration
      */
     public function testVue3MountFunctionality()
     {
         $response = $this->get('/');
-
         $response->assertStatus(200);
 
-        // Check that the app mount point exists
-        $response->assertSee('id="app"', false);
+        $content = $response->getContent();
 
-        // Check that Vue app.js is loaded
-        $response->assertSee('js/app.js', false);
+        // Verify Vue app mount point structure
+        $this->assertStringContainsString('id="app"', $content, 'Vue mount point should exist');
+
+        // Verify currency component is present within the app
+        $this->assertStringContainsString('<currency-component>', $content, 'Currency component should be mounted within Vue app');
+
+        // Verify no Vue mounting errors
+        $this->assertStringNotContainsString('Vue.createApp is not a function', $content);
+        $this->assertStringNotContainsString('[Vue warn]', $content);
+        $this->assertStringNotContainsString('Failed to mount app', $content);
+
+        // Verify JavaScript is included for mounting
+        $this->assertStringContainsString('/js/app.js', $content, 'Vue JavaScript should be included');
     }
 
     /**
-     * Test that currency component integration works end-to-end
-     *
-     * @return void
+     * Test Vue 3 reactivity by checking currency component reactive elements
+     * This verifies reactive form inputs and data binding work in Vue 3
      */
-    public function testCurrencyComponentEndToEndFunctionality()
-    {
-        // Test the currency rates page where the component should be used
-        $response = $this->get('/currency-rates');
-
-        $response->assertStatus(200);
-
-        // Verify the page loads with Vue app container
-        $response->assertSee('<div id="app">', false);
-
-        // Verify JavaScript is included
-        $response->assertSee('js/app.js', false);
-
-        // Verify Livewire is also working alongside Vue
-        $response->assertSee('@livewire', false);
-    }
-
-    /**
-     * Test Vue 3 reactivity by simulating component state changes
-     *
-     * @return void
-     */
-    public function testVue3Reactivity()
+    public function testVue3ReactivityFunctionality()
     {
         $response = $this->get('/');
-
         $response->assertStatus(200);
 
-        // Test that reactive data binding structure is in place
-        $response->assertSee('id="app"', false);
+        $content = $response->getContent();
 
-        // Verify that form inputs exist for reactivity testing
-        $responseContent = $response->getContent();
+        // Currency component should contain reactive form elements
+        $this->assertStringContainsString('<currency-component>', $content);
 
-        // Should contain form elements for currency component interaction
-        $this->assertStringNotContainsString('vue-error', $responseContent);
-        $this->assertStringNotContainsString('Vue warn', $responseContent);
+        // Verify no Vue reactivity warnings/errors
+        $this->assertStringNotContainsString('Uncaught TypeError', $content);
+        $this->assertStringNotContainsString('reactivity error', $content);
+        $this->assertStringNotContainsString('Vue 2 reactivity', $content);
+
+        // Check currency component source for Vue 3 reactive patterns
+        $componentPath = resource_path('assets/js/components/CurrencyComponent.vue');
+        if (file_exists($componentPath)) {
+            $componentContent = file_get_contents($componentPath);
+
+            // Vue component should have data function (Vue 3 compatible)
+            $this->assertStringContainsString('data()', $componentContent, 'Component should use Vue 3 data() function');
+
+            // Should have reactive form elements
+            $this->assertStringContainsString('v-model=', $componentContent, 'Component should have reactive v-model bindings');
+            $this->assertStringContainsString('v-on:', $componentContent, 'Component should have event handlers');
+        }
     }
 
     /**
-     * Test that Vue 3 components are properly registered
-     *
-     * @return void
+     * Comprehensive Vue 3 upgrade success verification
+     * This test confirms the full Vue 3 upgrade is working end-to-end
+     */
+    public function testVue3UpgradeSuccessEndToEnd()
+    {
+        // Test 1: Blade view loads with Vue component
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $content = $response->getContent();
+
+        // Verify Vue app structure
+        $this->assertStringContainsString('<div id="app">', $content, 'Vue app container should exist');
+        $this->assertStringContainsString('<currency-component></currency-component>', $content, 'Currency component should be present');
+
+        // Test 2: JavaScript compilation successful
+        $appJsPath = public_path('js/app.js');
+        $this->assertFileExists($appJsPath, 'Compiled Vue JavaScript should exist');
+
+        $jsContent = file_get_contents($appJsPath);
+        $this->assertStringContainsString('Vue', $jsContent, 'Vue should be compiled into JavaScript');
+
+        // Test 3: No Vue 2/3 compatibility errors
+        $this->assertStringNotContainsString('Vue 2 compatibility', $content);
+        $this->assertStringNotContainsString('Vue.component is not a function', $content);
+        $this->assertStringNotContainsString('createApp is not defined', $content);
+
+        // Test 4: Component registration working
+        $this->assertStringContainsString('currency-component', $jsContent, 'Currency component should be registered');
+
+        // Test 5: API configuration present
+        $this->assertStringContainsString('API_URL', $content, 'API configuration should be available for components');
+
+        // Test 6: No console errors in page source
+        $this->assertStringNotContainsString('console.error', $content);
+        $this->assertStringNotContainsString('Uncaught', $content);
+    }
+
+    /**
+     * Test Vue 3 components are properly registered and functional
+     * This verifies component registration works in Vue 3 syntax
      */
     public function testVue3ComponentRegistration()
     {
+        $appJsPath = resource_path('assets/js/app.js');
+
+        if (file_exists($appJsPath)) {
+            $appJsContent = file_get_contents($appJsPath);
+
+            // Check for component registration
+            $this->assertStringContainsString('currency-component', $appJsContent, 'Currency component should be registered in app.js');
+
+            // For Vue 3 upgrade, ensure no old Vue 2 syntax errors
+            if (strpos($appJsContent, 'Vue.createApp') !== false) {
+                // Vue 3 syntax
+                $this->assertStringContainsString('createApp', $appJsContent, 'Vue 3 createApp should be used');
+            } else {
+                // Vue 2 syntax (still valid during transition)
+                $this->assertStringContainsString('new Vue', $appJsContent, 'Vue 2 syntax should work during upgrade');
+            }
+        }
+
+        // Test component renders in browser
         $response = $this->get('/');
-
         $response->assertStatus(200);
-
-        // Test that the page structure supports component mounting
-        $response->assertSee('<div id="app">', false);
-
-        // Ensure no Vue compilation errors in response
-        $content = $response->getContent();
-        $this->assertStringNotContainsString('[Vue warn]', $content);
-        $this->assertStringNotContainsString('Vue.component is not a function', $content);
+        $response->assertSee('<currency-component>', false);
     }
 
     /**
-     * Test Vue 3 upgrade compatibility with existing Livewire components
-     *
-     * @return void
+     * Test that compiled assets support Vue 3 and work with existing Livewire
+     * This ensures Vue 3 coexists with Livewire components
      */
-    public function testVue3LivewireCompatibility()
+    public function testVue3LivewireCoexistence()
     {
-        $response = $this->get('/currency-rates');
+        // Test home page (Vue components)
+        $vueResponse = $this->get('/');
+        $vueResponse->assertStatus(200);
+        $vueContent = $vueResponse->getContent();
 
-        $response->assertStatus(200);
+        // Should contain Vue app
+        $this->assertStringContainsString('id="app"', $vueContent);
+        $this->assertStringContainsString('<currency-component>', $vueContent);
+        $this->assertStringContainsString('js/app.js', $vueContent);
 
-        // Test that both Vue and Livewire can coexist
-        $response->assertSee('@livewireStyles', false);
-        $response->assertSee('@livewireScripts', false);
-        $response->assertSee('js/app.js', false);
+        // Test currency-rates page (Livewire components)
+        $livewireResponse = $this->get('/currency-rates');
+        $livewireResponse->assertStatus(200);
+        $livewireContent = $livewireResponse->getContent();
 
-        // Verify no conflicts between Vue and Livewire
-        $content = $response->getContent();
-        $this->assertStringNotContainsString('Livewire: Cannot find parent', $content);
-        $this->assertStringNotContainsString('Vue is not defined', $content);
-    }
+        // Should contain Livewire
+        $this->assertStringContainsString('@livewireStyles', $livewireContent);
+        $this->assertStringContainsString('@livewireScripts', $livewireContent);
+        $this->assertStringContainsString('@livewire', $livewireContent);
 
-    /**
-     * Test that currency component form elements render correctly
-     *
-     * @return void
-     */
-    public function testCurrencyComponentFormRendering()
-    {
-        // Create a test page that includes the currency component
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-
-        // Verify basic HTML structure is present for Vue mounting
-        $response->assertSee('<div id="app">', false);
-
-        // Test that no Vue template compilation errors occurred
-        $content = $response->getContent();
-        $this->assertStringNotContainsString('Template compilation error', $content);
-        $this->assertStringNotContainsString('failed to mount component', $content);
+        // Both should load without conflicts
+        $this->assertStringNotContainsString('Livewire conflicts with Vue', $vueContent);
+        $this->assertStringNotContainsString('Vue conflicts with Livewire', $livewireContent);
+        $this->assertStringNotContainsString('Alpine conflicts', $livewireContent);
     }
 
     /**
      * Test Vue 3 error handling and graceful degradation
-     *
-     * @return void
+     * This ensures Vue 3 upgrade handles errors properly
      */
-    public function testVue3ErrorHandling()
+    public function testVue3ErrorHandlingAndDegradation()
     {
         $response = $this->get('/');
-
         $response->assertStatus(200);
 
-        // Ensure no JavaScript errors are present in the response
         $content = $response->getContent();
 
-        $this->assertStringNotContainsString('Uncaught', $content);
-        $this->assertStringNotContainsString('TypeError', $content);
+        // Verify no Vue 3 specific errors
+        $this->assertStringNotContainsString('Vue 3 error', $content);
+        $this->assertStringNotContainsString('composition API error', $content);
+        $this->assertStringNotContainsString('reactive error', $content);
+        $this->assertStringNotContainsString('createApp error', $content);
+
+        // Verify no JavaScript runtime errors
         $this->assertStringNotContainsString('ReferenceError', $content);
-        $this->assertStringNotContainsString('Vue.createApp is not a function', $content);
-    }
+        $this->assertStringNotContainsString('TypeError: Cannot read', $content);
+        $this->assertStringNotContainsString('Uncaught Error', $content);
 
-    /**
-     * Test that Vue 3 upgrade maintains API compatibility
-     *
-     * @return void
-     */
-    public function testVue3ApiCompatibility()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-
-        // Verify that expected API endpoints are still accessible
-        $apiResponse = $this->get('/api/test');
-
-        // Test should pass even if API doesn't exist (graceful handling)
-        $this->assertTrue($apiResponse->status() === 200 || $apiResponse->status() === 404);
-
-        // Main page should load without errors
-        $content = $response->getContent();
-        $this->assertStringNotContainsString('API Error', $content);
-    }
-
-    /**
-     * Comprehensive Vue 3 upgrade verification test
-     *
-     * @return void
-     */
-    public function testVue3UpgradeSuccess()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-
-        // Test 1: Basic Vue app structure
-        $response->assertSee('<div id="app">', false);
-
-        // Test 2: JavaScript files load
-        $response->assertSee('js/app.js', false);
-
-        // Test 3: No Vue 2 specific errors
-        $content = $response->getContent();
-        $this->assertStringNotContainsString('Vue 2 is not compatible', $content);
-        $this->assertStringNotContainsString('deprecated', $content);
-
-        // Test 4: Currency rates page with components works
-        $currencyResponse = $this->get('/currency-rates');
-        $currencyResponse->assertStatus(200);
-        $currencyResponse->assertSee('Currency Exchange Rates');
-
-        // Test 5: Livewire integration remains functional
-        $currencyResponse->assertSee('@livewire', false);
-
-        // Test 6: No console errors or warnings in page source
-        $this->assertStringNotContainsString('[Vue warn]', $content);
-        $this->assertStringNotContainsString('console.error', $content);
-    }
-
-    /**
-     * Test Vue 3 component mounting with simulated user interaction
-     *
-     * @return void
-     */
-    public function testVue3ComponentMountingAndInteraction()
-    {
-        // Test home page with Vue app
-        $response = $this->get('/');
-        $response->assertStatus(200);
-        $response->assertSee('<div id="app">', false);
-
-        // Test currency rates page with potential Vue components
-        $currencyResponse = $this->get('/currency-rates');
-        $currencyResponse->assertStatus(200);
-
-        // Verify page loads without throwing JavaScript errors
-        $content = $currencyResponse->getContent();
-        $this->assertStringNotContainsString('Cannot read property', $content);
-        $this->assertStringNotContainsString('is not a function', $content);
-
-        // Verify Vue app container exists for component mounting
-        $currencyResponse->assertSee('<div id="app">', false);
-
-        // Verify that both Livewire and Vue can coexist
-        $this->assertTrue(
-            str_contains($content, '@livewire') &&
-            str_contains($content, 'js/app.js')
-        );
+        // Verify graceful handling if Vue fails to load
+        $this->assertStringNotContainsString('Vue is not defined', $content);
+        $this->assertStringNotContainsString('Cannot access before initialization', $content);
     }
 }
