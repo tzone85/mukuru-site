@@ -44,6 +44,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
+import axios from 'axios';
 
 // Reactive data
 const currencies = ref([]);
@@ -56,14 +57,14 @@ const order = reactive({
 
 // Methods
 const fetchCurrencies = () => {
-    window.axios.get(API_URL + "/currencies").then(response => {
+    axios.get(API_URL + "/currencies").then(response => {
         currencies.value = response.data;
     });
 };
 
 const getTotalAmount = () => {
     order.total_amount = '';
-    window.axios.post(API_URL + "/get-total-amount", order)
+    axios.post(API_URL + "/get-total-amount", order)
         .then(response => {
             order.total_amount = response.data.total_amount;
         })
@@ -74,7 +75,7 @@ const getTotalAmount = () => {
 
 const getForeignCurrencyAmount = () => {
     order.foreign_currency_amount = '';
-    window.axios.post(API_URL + "/get-foreign-currency-amount", order)
+    axios.post(API_URL + "/get-foreign-currency-amount", order)
         .then(response => {
             order.foreign_currency_amount = response.data.foreign_currency_amount;
         })
@@ -93,7 +94,7 @@ const getQuote = () => {
 };
 
 const createOrder = () => {
-    window.axios.post(API_URL + "/orders", order)
+    axios.post(API_URL + "/orders", order)
         .then(response => {
             console.log(response);
             alert('Order created');
